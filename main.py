@@ -7,6 +7,7 @@ sg.theme("SystemDefault1")
 values = {
     "brightness": 1.0,
     "contrast": 1.0,
+    "white": 255,
 }
 
 window = sg.Window(
@@ -38,6 +39,17 @@ window = sg.Window(
                             enable_events=True,
                         ),
                     ],
+                    [
+                        sg.Text("White Level"),
+                        sg.Slider(
+                            range=(0, 255),
+                            resolution=1,
+                            default_value=values["white"],
+                            key="white",
+                            orientation="h",
+                            enable_events=True,
+                        ),
+                    ],
                 ]
             ),
         ]
@@ -46,12 +58,19 @@ window = sg.Window(
 
 event, values = window.read(timeout=0)
 
+def set_white_level(pixel, level):
+    if sum(pixel) > level*3:
+        return (255,255,255)
+    else:
+        return pixel
+
 with Image.open("01.jpg") as im_orig:
     im_orig.thumbnail((400, 300))
     while True:
         im = im_orig
         im = ImageEnhance.Brightness(im).enhance(values["brightness"])
         im = ImageEnhance.Contrast(im).enhance(values["contrast"])
+        im.putdata([set_white_level(p, values["white"]) for p in im.getdata()])
         b = io.BytesIO()
         im.save(b, "PNG")
         image_bytes = b.getvalue()
