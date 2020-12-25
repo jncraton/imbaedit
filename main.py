@@ -32,8 +32,6 @@ with Image.open('01.jpg') as im_orig:
 
         window['image'].update(data=image_bytes)
 
-        print(event, values)
-
         event, values = window.read()
 
         if event == sg.WIN_CLOSED or event == 'Exit':
