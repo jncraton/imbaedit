@@ -61,11 +61,13 @@ window = sg.Window(
 
 event, values = window.read(timeout=0)
 
+
 def set_white_level(pixel, level):
-    if sum(pixel) > level*3:
-        return (255,255,255)
+    if sum(pixel) > level * 3:
+        return (255, 255, 255)
     else:
         return pixel
+
 
 with Image.open("01.jpg") as im_orig:
     im_orig.thumbnail((400, 300))
@@ -85,6 +87,6 @@ with Image.open("01.jpg") as im_orig:
         if event == sg.WIN_CLOSED or event == "Exit":
             break
 
-        if event == 'Run':
+        if event == "Run":
             print("Running batch conversion...")
             break
