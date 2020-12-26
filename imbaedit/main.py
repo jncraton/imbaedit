@@ -2,6 +2,7 @@ import os, sys, io
 import PySimpleGUI as sg
 from PIL import Image, ImageEnhance
 
+
 def set_white_level(pixel, level):
     if sum(pixel) > level * 3:
         return (255, 255, 255)
@@ -16,7 +17,8 @@ def apply_filters(im, values):
 
     return im
 
-if __name__ == "__main__":
+
+def main():
     sg.theme("SystemDefault1")
 
     values = {
@@ -99,3 +101,7 @@ if __name__ == "__main__":
                 im = apply_filters(Image.open(sys.argv[1]), values)
                 im.save(file)
             break
+
+
+if __name__ == "__main__":
+    main()
