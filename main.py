@@ -76,21 +76,26 @@ def apply_filters(im, values):
 
     return im
 
-with Image.open(sys.argv[1]) as im_orig:
-    im_orig.thumbnail((400, 300))
-    while True:
-        im = apply_filters(im_orig, values)
-        b = io.BytesIO()
-        im.save(b, "PNG")
-        image_bytes = b.getvalue()
+im_orig = Image.open(sys.argv[1])
+im_orig.thumbnail((400, 300))
+while True:
+    im = apply_filters(im_orig, values)
+    b = io.BytesIO()
+    im.save(b, "PNG")
+    image_bytes = b.getvalue()
 
-        window["image"].update(data=image_bytes)
+    window["image"].update(data=image_bytes)
 
-        event, values = window.read()
+    event, values = window.read()
 
-        if event == sg.WIN_CLOSED or event == "Exit":
-            break
+    if event == sg.WIN_CLOSED or event == "Exit":
+        break
 
-        if event == "Run":
-            print("Running batch conversion...")
-            break
+    if event == "Run":
+        im_orig.close()
+        print("Running batch conversion...")
+        for file in sys.argv[1:]:
+            print(f"Converting {file}...")
+            im = apply_filters(Image.open(sys.argv[1]), values)
+            im.save(f"new-{file}")
+        break
