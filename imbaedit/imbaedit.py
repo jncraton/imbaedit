@@ -13,6 +13,7 @@ def set_white_level(pixel, level):
 def apply_filters(im, values):
     im = ImageEnhance.Brightness(im).enhance(values["brightness"])
     im = ImageEnhance.Contrast(im).enhance(values["contrast"])
+    im = ImageEnhance.Color(im).enhance(values["saturation"])
     im.putdata([set_white_level(p, values["white"]) for p in im.getdata()])
 
     return im
@@ -24,6 +25,7 @@ def main():
     values = {
         "brightness": 1.0,
         "contrast": 1.0,
+        "saturation": 1.0,
         "white": 255,
     }
 
@@ -52,6 +54,17 @@ def main():
                                 resolution=0.01,
                                 default_value=values["contrast"],
                                 key="contrast",
+                                orientation="h",
+                                enable_events=True,
+                            ),
+                        ],
+                        [
+                            sg.Text("Saturation"),
+                            sg.Slider(
+                                range=(0.0, 2.0),
+                                resolution=0.01,
+                                default_value=values["saturation"],
+                                key="saturation",
                                 orientation="h",
                                 enable_events=True,
                             ),
