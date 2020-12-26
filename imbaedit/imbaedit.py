@@ -50,11 +50,16 @@ def autocrop(image):
     return image.crop(tuple(box))
 
 def apply_filters(im, values):
-    im = ImageEnhance.Brightness(im).enhance(values["brightness"].get())
-    im = ImageEnhance.Contrast(im).enhance(values["contrast"].get())
-    im = ImageEnhance.Color(im).enhance(values["saturation"].get())
-    im = ImageEnhance.Sharpness(im).enhance(values["sharpness"].get())
-    im.putdata([set_white_level(p, values["white"].get()) for p in im.getdata()])
+    if values["brightness"].get() != 1.0:
+        im = ImageEnhance.Brightness(im).enhance(values["brightness"].get())
+    if values["contrast"].get() != 1.0:
+        im = ImageEnhance.Contrast(im).enhance(values["contrast"].get())
+    if values["saturation"].get() != 1.0:
+        im = ImageEnhance.Color(im).enhance(values["saturation"].get())
+    if values["sharpness"].get() != 1.0:
+        im = ImageEnhance.Sharpness(im).enhance(values["sharpness"].get())
+    if values["white"].get() != 1.0:
+        im.putdata([set_white_level(p, values["white"].get()) for p in im.getdata()])
     im = autocrop(im)
 
     return im
