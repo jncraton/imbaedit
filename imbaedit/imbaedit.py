@@ -9,6 +9,47 @@ def set_white_level(pixel, level):
     else:
         return pixel
 
+def autocrop(image):
+    box = [0, 0, 0, 0]
+
+    for x in range(image.width):
+        for y in range(image.height):
+            if image.getpixel((x,y)) != (255,255,255):
+                box[0] = x
+                break
+        else:
+            continue
+        break
+
+    for x in range(image.width-1, -1, -1):
+        for y in range(image.height):
+            if image.getpixel((x,y)) != (255,255,255):
+                box[2] = x
+                break
+        else:
+            continue
+        break
+
+    for y in range(image.height):
+        for x in range(image.width):
+            if image.getpixel((x,y)) != (255,255,255):
+                box[1] = y
+                break
+        else:
+            continue
+        break
+
+    for y in range(image.height-1, -1, -1):
+        for x in range(image.width):
+            if image.getpixel((x,y)) != (255,255,255):
+                box[3] = y
+                break
+        else:
+            continue
+        break
+
+    print(box)
+    return image.crop(tuple(box))
 
 def apply_filters(im, values):
     im = ImageEnhance.Brightness(im).enhance(values["brightness"])
@@ -16,6 +57,7 @@ def apply_filters(im, values):
     im = ImageEnhance.Color(im).enhance(values["saturation"])
     im = ImageEnhance.Sharpness(im).enhance(values["sharpness"])
     im.putdata([set_white_level(p, values["white"]) for p in im.getdata()])
+    im = autocrop(im)
 
     return im
 
@@ -35,7 +77,7 @@ def main():
         "Title",
         [
             [
-                sg.Image(key="image"),
+                sg.Image(key="image", size=(400,300)),
                 sg.Column(
                     [
                         [
