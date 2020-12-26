@@ -69,13 +69,17 @@ def set_white_level(pixel, level):
         return pixel
 
 
-with Image.open("01.jpg") as im_orig:
+def apply_filters(im, values):
+    im = ImageEnhance.Brightness(im).enhance(values["brightness"])
+    im = ImageEnhance.Contrast(im).enhance(values["contrast"])
+    im.putdata([set_white_level(p, values["white"]) for p in im.getdata()])
+
+    return im
+
+with Image.open(sys.argv[1]) as im_orig:
     im_orig.thumbnail((400, 300))
     while True:
-        im = im_orig
-        im = ImageEnhance.Brightness(im).enhance(values["brightness"])
-        im = ImageEnhance.Contrast(im).enhance(values["contrast"])
-        im.putdata([set_white_level(p, values["white"]) for p in im.getdata()])
+        im = apply_filters(im_orig, values)
         b = io.BytesIO()
         im.save(b, "PNG")
         image_bytes = b.getvalue()
