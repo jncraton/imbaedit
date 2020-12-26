@@ -76,6 +76,7 @@ def apply_filters(im, values):
 
     return im
 
+
 im_orig = Image.open(sys.argv[1])
 im_orig.thumbnail((400, 300))
 while True:
