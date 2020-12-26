@@ -97,5 +97,5 @@ while True:
         for file in sys.argv[1:]:
             print(f"Converting {file}...")
             im = apply_filters(Image.open(sys.argv[1]), values)
-            im.save(f"new-{file}")
+            im.save(file)
         break
