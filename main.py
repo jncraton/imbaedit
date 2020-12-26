@@ -50,6 +50,9 @@ window = sg.Window(
                             enable_events=True,
                         ),
                     ],
+                    [
+                        sg.Button("Run"),
+                    ],
                 ]
             ),
         ]
@@ -80,4 +83,8 @@ with Image.open("01.jpg") as im_orig:
         event, values = window.read()
 
         if event == sg.WIN_CLOSED or event == "Exit":
+            break
+
+        if event == 'Run':
+            print("Running batch conversion...")
             break
