@@ -1,10 +1,9 @@
 import os, sys, io
-import PySimpleGUI as sg
+from tkinter import *
 from PIL import Image, ImageEnhance
 
-
 def set_white_level(pixel, level):
-    if sum(pixel) > level * 3:
+    if sum(pixel) > level * 255 * 3:
         return (255, 255, 255)
     else:
         return pixel
@@ -52,124 +51,67 @@ def autocrop(image):
     return image.crop(tuple(box))
 
 def apply_filters(im, values):
-    im = ImageEnhance.Brightness(im).enhance(values["brightness"])
-    im = ImageEnhance.Contrast(im).enhance(values["contrast"])
-    im = ImageEnhance.Color(im).enhance(values["saturation"])
-    im = ImageEnhance.Sharpness(im).enhance(values["sharpness"])
-    im.putdata([set_white_level(p, values["white"]) for p in im.getdata()])
+    im = ImageEnhance.Brightness(im).enhance(values["brightness"].get())
+    im = ImageEnhance.Contrast(im).enhance(values["contrast"].get())
+    im = ImageEnhance.Color(im).enhance(values["saturation"].get())
+    im = ImageEnhance.Sharpness(im).enhance(values["sharpness"].get())
+    im.putdata([set_white_level(p, values["white"].get()) for p in im.getdata()])
     im = autocrop(im)
 
     return im
 
 
+def run():
+    print("Running batch conversion...")
+    for file in sys.argv[1:]:
+        print(f"Converting {file}...")
+        im = apply_filters(Image.open(sys.argv[1]), values)
+        im.save(file)
+
 def main():
-    sg.theme("SystemDefault1")
+    window = Tk()    
 
     values = {
-        "brightness": 1.0,
-        "contrast": 1.0,
-        "saturation": 1.0,
-        "sharpness": 1.0,
-        "white": 255,
+        "brightness": DoubleVar(window, 1.0),
+        "contrast": DoubleVar(window, 1.0),
+        "saturation": DoubleVar(window, 1.0),
+        "sharpness": DoubleVar(window, 1.0),
+        "white": DoubleVar(window, 1.0),
     }
-
-    window = sg.Window(
-        "Title",
-        [
-            [
-                sg.Image(key="image", size=(400,300)),
-                sg.Column(
-                    [
-                        [
-                            sg.Text("Brightness"),
-                            sg.Slider(
-                                range=(0.0, 2.0),
-                                resolution=0.01,
-                                default_value=values["brightness"],
-                                key="brightness",
-                                orientation="h",
-                                enable_events=True,
-                            ),
-                        ],
-                        [
-                            sg.Text("Contrast"),
-                            sg.Slider(
-                                range=(0.0, 2.0),
-                                resolution=0.01,
-                                default_value=values["contrast"],
-                                key="contrast",
-                                orientation="h",
-                                enable_events=True,
-                            ),
-                        ],
-                        [
-                            sg.Text("Saturation"),
-                            sg.Slider(
-                                range=(0.0, 2.0),
-                                resolution=0.01,
-                                default_value=values["saturation"],
-                                key="saturation",
-                                orientation="h",
-                                enable_events=True,
-                            ),
-                        ],
-                        [
-                            sg.Text("Sharpness"),
-                            sg.Slider(
-                                range=(0.0, 2.0),
-                                resolution=0.01,
-                                default_value=values["sharpness"],
-                                key="sharpness",
-                                orientation="h",
-                                enable_events=True,
-                            ),
-                        ],
-                        [
-                            sg.Text("White Level"),
-                            sg.Slider(
-                                range=(0, 255),
-                                resolution=1,
-                                default_value=values["white"],
-                                key="white",
-                                orientation="h",
-                                enable_events=True,
-                            ),
-                        ],
-                        [
-                            sg.Button("Run"),
-                        ],
-                    ]
-                ),
-            ]
-        ],
-    )
-
-    event, values = window.read(timeout=0)
 
     im_orig = Image.open(sys.argv[1])
     im_orig.thumbnail((400, 300))
-    while True:
+
+    def update(e=None):
         im = apply_filters(im_orig, values)
         b = io.BytesIO()
-        im.save(b, "PNG")
-        image_bytes = b.getvalue()
+        im.save(b, "PPM")
 
-        window["image"].update(data=image_bytes)
+        photoimage = PhotoImage(data=b.getvalue())
+        img.configure(image=photoimage)
+        img.image=photoimage
 
-        event, values = window.read()
+    window.title("imbaedit")
 
-        if event == sg.WIN_CLOSED or event == "Exit":
-            break
+    img = Label(window, width=400, height=300)
+    img.grid(column=0, row=0)
 
-        if event == "Run":
-            im_orig.close()
-            print("Running batch conversion...")
-            for file in sys.argv[1:]:
-                print(f"Converting {file}...")
-                im = apply_filters(Image.open(sys.argv[1]), values)
-                im.save(file)
-            break
+    Scale(window, from_=0.0, to=2.0, resolution=.01, orient=HORIZONTAL, variable=values['brightness'], label="Brightness", command=update).grid(column=0, row=1)
+    
+    Scale(window, from_=0.0, to=2.0, resolution=.01, orient=HORIZONTAL, variable=values['contrast'], label="Contrast", command=update).grid(column=0, row=2)
+    
+    Scale(window, from_=0.0, to=2.0, resolution=.01, orient=HORIZONTAL, variable=values['saturation'], label="Saturation", command=update).grid(column=0, row=3)
+    
+    Scale(window, from_=0.0, to=2.0, resolution=.01, orient=HORIZONTAL, variable=values['sharpness'], label="Sharpness", command=update).grid(column=0, row=4)
+    
+    Scale(window, from_=0.0, to=2.0, resolution=.01, orient=HORIZONTAL, variable=values['white'], label="White", command=update).grid(column=0, row=5)
 
+    btn = Button(window, text="Run", font=("Arial Bold", 16), command=run)
+    btn.grid(column=0, row=6)
+
+    update()
+    
+    window.mainloop()
 
 if __name__ == "__main__":
     main()

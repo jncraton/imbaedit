@@ -5,7 +5,7 @@ with open("readme.md", "r") as fh:
 
 setuptools.setup(
     name="imbaedit",
-    version="1.0.2",
+    version="1.0.3",
     author="Jon Craton",
     author_email="jon@joncraton.com",
     description="Image Batch Editor",
@@ -25,7 +25,6 @@ setuptools.setup(
         ],
     },
     install_requires=[
-        'pysimplegui',
         'pillow',
     ],
 )
