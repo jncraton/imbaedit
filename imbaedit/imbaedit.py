@@ -68,14 +68,6 @@ def apply_filters(im, values):
     return im
 
 
-def run():
-    print("Running batch conversion...")
-    for file in sys.argv[1:]:
-        print(f"Converting {file}...")
-        im = apply_filters(Image.open(sys.argv[1]), values)
-        im.save(file)
-
-
 def main():
     window = Tk()
 
@@ -89,6 +81,13 @@ def main():
 
     im_orig = Image.open(sys.argv[1])
     im_orig.thumbnail((400, 300))
+
+    def run():
+        print("Running batch conversion...")
+        for file in sys.argv[1:]:
+            print(f"Converting {file}...")
+            im = apply_filters(Image.open(file), values)
+            im.save(file)
 
     def update(e=None):
         im = apply_filters(im_orig, values)
